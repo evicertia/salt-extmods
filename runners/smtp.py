@@ -19,15 +19,19 @@ from salt.utils.odict import OrderedDict as _OrderedDict
 
 log = logging.getLogger(__name__)
 
+def _error(ret, err_msg):
+    ret['result'] = False
+    ret['comment'] = err_msg
+    return ret
+
 def send_msg(recipient,
         message,
         subject='Message from Salt',
         sender=None,
-        server=None,
         use_ssl='True',
-        usermessage=None,
-        password=None,
-        profile=None):
+        profile=None,
+        template=None,
+        context={}):
     '''
     This is the runner counterpart to module/state.smtp.send_msg
 
@@ -47,9 +51,33 @@ def send_msg(recipient,
         return ret
 
     # TODO: Initialize pillar data..
-    minion = salt.minion.MasterMinion(__opts__)
+    local_minion_opts = __opts__.copy()
+    local_minion_opts['file_client'] = 'local'
+    minion = salt.minion.MasterMinion(local_minion_opts)
 
-    #import IPython; IPython.embed_kernel();
+    if template != None:
+        tmplfn = minion.functions['cp.get_template'](
+            message,
+            '',
+            template=template,
+            context=context
+        )
+        msg = 'cp.get_template returned {0} (Called with: {1})'
+        log.debug(msg.format(tmplfn, message))
+        if tmplfn:
+            tmplines = None
+            with salt.utils.fopen(tmplfn, 'rb') as fp_:
+                tmplines = fp_.readlines()
+            if not tmplines:
+                msg = 'Failed to read rendered template file {0} ({1})'
+                log.debug(msg.format(tmplfn, message))
+		raise ValueError(msg.format(tmplfn, message))
+            message = ''.join(tmplines)
+        else:
+            msg = 'Failed to load template file {0}'.format(message)
+            log.debug(msg)
+            raise ValueError(msg)
+
     command = minion.functions['smtp.send_msg'](
         message=message,
         recipient=recipient,
