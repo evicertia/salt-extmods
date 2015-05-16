@@ -20,3 +20,7 @@ def md5hash(s):
     m = hashlib.md5()
     m.update(s)
     return m.hexdigest()
+
+def throw(s):
+    """Raise an error. Mostly usefull within jinja templates"""
+    raise Exception(s)
