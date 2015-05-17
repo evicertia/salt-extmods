@@ -24,3 +24,7 @@ def md5hash(s):
 def throw(s):
     """Raise an error. Mostly usefull within jinja templates"""
     raise Exception(s)
+
+def is_dict(o):
+   """Test wether 'o' is a dict"""
+   return isinstance(o, dict)
