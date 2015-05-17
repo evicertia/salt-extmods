@@ -103,9 +103,11 @@ def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
         cert, key = create_cert_for(host, opts)
 
     if cert != None or key != None:
-        data = res['pki'] = {}
-        data['certs'] = { host: cert }
-        data['privkeys'] = { host: key }
+        data = res['pki'] = pillar['pki'] if 'pki' in pillar else {}
+        certs = data['certs'] = data['certs'] if 'certs' in data else {}
+        certs.update({ host: cert })
+        privkeys = data['privkeys'] = data['privkeys'] if 'privkeys' in data else {}
+        privkeys.update({ host: key })
 
     return res
 
