@@ -26,6 +26,16 @@ def _ipv4_to_bits(ipaddr):
     '''
     return ''.join([bin(int(x))[2:].rjust(8, '0') for x in ipaddr.split('.')])
 
+def _int_to_ipv4(num):
+    return '.'.join([str(num >> (i << 3) & 0xFF) for i in range(0, 4)[::-1]])
+
+def _maxhost_of_subnet(subnet):
+    cidr, masklen = subnet.split('/')
+    masklen = int(masklen)
+    bits = _ipv4_to_bits(cidr)
+    gwbits = (bits[:masklen] + ('1' * (31 - masklen)) + '0')
+    return _int_to_ipv4(int(gwbits, 2))
+
 class Registry:
     def __init__(self, accounts, hosts, networks):
         self.hosts = hosts
@@ -42,15 +52,39 @@ class Registry:
         key = host if host != None else __grains__['id']
         return self.get_host_attr(key, 'address')
     
-    def host_netmask(self, host=None):
-        masklen = 33
+    def host_subnet(self, host=None):
         host = host if host != None else __grains__['id']
 
         addr = self.get_host_attr(host, 'address')
         if addr is None: return None
 
+        netmask = self.get_host_attr(host, 'netmask')
+        if (netmask != None): return salt.utils.netmask.calculate_subnet(addr, result)
+
+        result = None
+        masklen = 33
+
+        for net, data in self.networks.iteritems():
+            cidr = data['cidr'] if 'cidr' in data else None
+            if cidr == None: continue
+
+            if salt.utils.network.in_subnet(cidr, [ addr ]):
+                newlen = int(cidr.split('/')[1])
+                if newlen < masklen:
+                    masklen = newlen
+                    result = cidr
+
+        return result
+
+    def host_netmask(self, host=None):
+        masklen = 33
+        host = host if host != None else __grains__['id']
+
         result = self.get_host_attr(host, 'netmask')
         if (result != None): return result
+
+        addr = self.get_host_attr(host, 'address')
+        if addr is None: return None
 
         for net, data in self.networks.iteritems():
             cidr = data['cidr'] if 'cidr' in data else None
@@ -64,6 +98,34 @@ class Registry:
 
         return result
 
+    def host_gateway(self, host=None):
+        host = host if host != None else __grains__['id']
+        
+        result = self.get_host_attr(host, 'gateway')
+        if (result != None): return result
 
+	return _maxhost_of_subnet(self.host_subnet(host))
+
+    def host_dnslist(self, host=None):
+        host = host if host != None else __grains__['id']
+        masklen = 33
+
+        result = self.get_host_attr(host, 'dns')
+        if (result != None): return result
+
+        addr = self.get_host_attr(host, 'address')
+        if addr is None: return None
+
+        for net, data in self.networks.iteritems():
+            cidr = data['cidr'] if 'cidr' in data else None
+            if cidr == None: continue
+
+            if salt.utils.network.in_subnet(cidr, [ addr ]):
+                newlen = int(cidr.split('/')[1])
+                if newlen < masklen:
+                    masklen = newlen
+                    result = [ _maxhost_of_subnet(cidr) ]
+
+        return [ self.host_gateway(host) ] if result is None else result
 
 # vim: set ai,ts=4,expandtab
