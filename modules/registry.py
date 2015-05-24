@@ -47,7 +47,11 @@ class Registry:
     def get_host_attr(self, host, attr):
         data = self.get_host(host)
         return data[attr] if attr in data else None
-    
+   
+    def host_iface(self, host=None):
+        host = host if host != None else __grains__['id']
+        return self.get_host_attr(host, 'iface')
+ 
     def host_address(self, host=None):
         key = host if host != None else __grains__['id']
         return self.get_host_attr(key, 'address')
