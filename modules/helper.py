@@ -4,10 +4,12 @@ Local helper methods
 
 from __future__ import print_function
 
+import sys
 import re
 import copy
 import hashlib
 import salt.output
+import traceback
 
 _ANSI2HTML_STYLES = {}
 ANSI2HTML_CODES_RE = re.compile('(?:\033\\[(\d+(?:;\d+)*)?([cnRhlABCDfsurgKJipm]))')
@@ -156,18 +158,30 @@ def ansi2html(text, palette='solarized'):
 
 
 def render_highstate(id, data):
+    global __opts__ # pylint: disable=W0601
+
     opts = copy.deepcopy(__opts__)
-    opts.update({
-      'output': 'highstate',
-      'state_output': 'changes',
+    __opts__.update({
+      #'output': 'highstate',
+      'state_output': 'mixed',
       'state_verbose': False,
       'force_color': True,
+      'color' : True,
       'strip_colors': False
     })
-    text = salt.output.out_format(
+
+    try:
+        text = salt.output.out_format(
             {id: data},
-            opts['output'],
-            opts,
-          )
-    return ansi2html(text, palette='solarized')
+            'highstate',
+            __opts__,
+        )
+        return ansi2html(text)
+    except:
+        e = sys.exc_info()[0]
+        #opts.update({ 'output': 'yaml' })
+        text = salt.output.out_format(data, 'yaml', __opts__)
+        return '%s\n\n---\nOutput Conversion Failed:\n%s' % (ansi2html(text), traceback.format_exc(e))
+    finally:
+        __opts__ = opts
 
