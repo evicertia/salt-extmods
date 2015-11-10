@@ -34,7 +34,7 @@ __opts__ = {
 }
 
 def __init__( __opts__ ):
-    log.info('Initialized..')
+    return
 
 def create_cert_for(host, opts):
     log.info('Generating certificate for: {0}'.format(host))
