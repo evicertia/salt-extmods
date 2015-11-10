@@ -2,6 +2,8 @@
 Registry helper functions module.
 '''
 
+from __future__ import absolute_import
+
 # Import python libs
 import logging
 import collections
@@ -15,6 +17,9 @@ import salt.utils.network
 from salt._compat import string_types
 
 log = logging.getLogger(__name__)
+
+def __virtual__():
+    return 'registry'
 
 def get_instance(accounts, networks, hosts):
     return Registry(accounts, networks, hosts)
