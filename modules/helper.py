@@ -169,6 +169,7 @@ def render_highstate(id, data):
       'color' : True,
       'strip_colors': False
     })
+    __opts__.pop('output', None)
 
     try:
         text = salt.output.out_format(
