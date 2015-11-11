@@ -23,6 +23,7 @@ ANSI2HTML_PALETTE = {
     # xterm:
     'xterm': ['#000000', '#CD0000', '#00CD00', '#CDCD00', '#0000EE', '#CD00CD', '#00CDCD', '#E5E5E5', '#7F7F7F', '#FF0000', '#00FF00', '#FFFF00', '#5C5CFF', '#FF00FF', '#00FFFF', '#FFFFFF'],
     'console': ['#000000', '#AA0000', '#00AA00', '#AA5500', '#0000AA', '#AA00AA', '#00AAAA', '#AAAAAA', '#555555', '#FF5555', '#55FF55', '#FFFF55', '#5555FF', '#FF55FF', '#55FFFF', '#FFFFFF'],
+    'pablo': ['#000000', '#CC0000', '#4E9A06', '#C4A000', '#3465A4', '#75507B', '#06989A', '#D3D7CF', '#555753', '#EF2929', '#8AE234', '#626262', '#729FCF', '#AD7FA8', '#34E2E2', '#EEEEEC'],
 }
 
 def __virtual__():
@@ -92,7 +93,7 @@ def _ansi2html_get_styles(palette):
         _ANSI2HTML_STYLES[palette] = (regular_style, bold_style, indexed_style)
     return _ANSI2HTML_STYLES[palette]
 
-def ansi2html(text, palette='solarized'):
+def ansi2html(text, palette='pablo'):
     def _ansi2html(m):
         if m.group(2) != 'm':
             return ''
@@ -164,7 +165,7 @@ def render_highstate(id, data):
     __opts__.update({
       #'output': 'highstate',
       'state_output': 'changes',
-      'state_verbose': False,
+      'state_verbose': True,
       'force_color': True,
       'color' : True,
       'strip_colors': False
