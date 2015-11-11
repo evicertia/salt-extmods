@@ -163,7 +163,7 @@ def render_highstate(id, data):
     opts = copy.deepcopy(__opts__)
     __opts__.update({
       #'output': 'highstate',
-      'state_output': 'mixed',
+      'state_output': 'changes',
       'state_verbose': False,
       'force_color': True,
       'color' : True,
