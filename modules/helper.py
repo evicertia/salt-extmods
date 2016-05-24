@@ -50,7 +50,6 @@ def is_dict(o):
    """Test wether 'o' is a dict"""
    return isinstance(o, dict)
 
-
 def _ansi2html_get_styles(palette):
     if palette not in _ANSI2HTML_STYLES:
         p = ANSI2HTML_PALETTE.get(palette, ANSI2HTML_PALETTE['console'])

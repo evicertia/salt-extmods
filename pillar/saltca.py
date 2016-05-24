@@ -15,7 +15,16 @@ import contextlib
 
 # Import salt libs
 import salt.utils
+from distutils.version import LooseVersion
 
+HAS_SSL = False
+X509_EXT_ENABLED = False
+try:
+    import OpenSSL
+    HAS_SSL = True
+    OpenSSL_version = LooseVersion(OpenSSL.__dict__.get('__version__', '0.0'))
+except ImportError:
+    pass
 
 # Set up logging
 log = logging.getLogger(__name__)
@@ -34,6 +43,12 @@ __opts__ = {
 }
 
 def __init__( __opts__ ):
+
+    global X509_EXT_ENABLED
+
+    if HAS_SSL and OpenSSL_version >= LooseVersion('0.15'):
+        X509_EXT_ENABLED = True
+
     return
 
 def create_cert_for(host, opts):
@@ -42,7 +57,8 @@ def create_cert_for(host, opts):
     pkiname = opts['saltca.pki.name']
     # tls.create_csr hosts cacert_path=/srv/salt/pki CN=sample.test.domain.com O=TESTCA emailAddress=support@test.com "subjectAltName=['DNS:sample.test.domain.com']"
     __salt__['tls.create_csr'](pkiname, 
-        cacert_path=cacert_path, 
+        cacert_path=cacert_path,
+	cert_type='common',
         CN=host,
         C=opts['saltca.pki.C'],
         ST=opts['saltca.pki.ST'],
@@ -50,11 +66,12 @@ def create_cert_for(host, opts):
         O=opts['saltca.pki.O'],
         OU=opts['saltca.pki.OU'],
         emailAddress=opts['saltca.pki.emailAddress'],
-        subjectAltName=['DNS:' + host]
+        subjectAltName=(['DNS:' + host] if X509_EXT_ENABLED else None)
     )
     # salt-call --local -l debug tls.create_ca_signed_cert hosts cacert_path=/srv/salt/pki CN=sample.test.domain.com days=3650
     __salt__['tls.create_ca_signed_cert'](pkiname,
         cacert_path=cacert_path,
+	cert_type='common',
         CN=host,
         days=opts['saltca.pki.days']
     )
