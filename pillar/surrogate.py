@@ -20,18 +20,25 @@ from salt.ext.six.moves import range
 
 # Set up logging
 log = logging.getLogger(__name__)
-command = 'salt-call -l quiet --local -c /etc/salt/empty --out=json --pillar-root={0} pillar.items'
+command = 'salt-call -l quiet --local -c /etc/salt/empty --out=json {0} pillar.items'
 
 def ext_pillar(minion_id,  # pylint: disable=W0613
                pillar,  # pylint: disable=W0613
-               path):
+	       root=None,
+	       modules=None):
     '''
     Execute a command and read the output as JSON
     '''
     try:
         log.info('fetching pillar data for {0}.'.format(minion_id))
+
+	params = {}
+	if root is not None: params['pillar-root'] = root
+	if modules is not None: params['module-dir'] = modules
+
         # TODO: Use spawn in order to fetch stderr and log it.
-        data = __salt__['cmd.run'](command.format(path))
+	args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
+        data = __salt__['cmd.run'](command.format(" ".join(args)))
         return _result_unicode_to_utf8(json.loads(data)['local'])
     except Exception:
         log.critical(
