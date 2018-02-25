@@ -169,6 +169,7 @@ def render_highstate(id, data):
       #'output': 'highstate',
       'state_output': 'changes',
       'state_verbose': True,
+      'state_output_profile': False,
       'force_color': True,
       'color' : True,
       'strip_colors': False
