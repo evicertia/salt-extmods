@@ -79,7 +79,9 @@ class Registry:
         return self.get_host_attr(key, 'address')
 
     def host_vlan(self, host=None):
-        data = self.get_network(host)
+        addr = self.host_address(host)
+        if addr is None: return None
+        data = self.get_network(addr)
         if data is None: return None
         return data['vlan'] if 'vlan' in data else None
 
