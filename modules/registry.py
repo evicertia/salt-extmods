@@ -107,6 +107,10 @@ class Registry:
 
         return result
 
+    def host_netbits(self, host=None):
+        result = self.host_netmask(host)
+        return salt.utils.network.get_net_size(result) if result != None else result
+
     def host_gateway(self, host=None):
         host = host if host != None else __grains__['id']
         
