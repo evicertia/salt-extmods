@@ -52,7 +52,24 @@ class Registry:
     def get_host_attr(self, host, attr):
         data = self.get_host(host)
         return data[attr] if attr in data else None
-   
+
+    def get_network(self, addr=None):
+        result = None
+        masklen = 33
+        addr = addr if addr != None else self.get_host()
+
+        for net, data in self.networks.iteritems():
+            cidr = data['cidr'] if 'cidr' in data else None
+            if cidr == None: continue
+
+            if salt.utils.network.in_subnet(cidr, [ addr ]):
+                newlen = int(cidr.split('/')[1])
+                if newlen < masklen:
+                    masklen = newlen
+                    result = data
+
+        return result
+
     def host_iface(self, host=None):
         host = host if host != None else __grains__['id']
         return self.get_host_attr(host, 'iface')
@@ -60,7 +77,12 @@ class Registry:
     def host_address(self, host=None):
         key = host if host != None else __grains__['id']
         return self.get_host_attr(key, 'address')
-    
+
+    def host_vlan(self, host=None):
+        data = self.get_network(host)
+        if data is None: return None
+        return data['vlan'] if 'vlan' in data else None
+
     def host_subnet(self, host=None):
         host = host if host != None else __grains__['id']
 
