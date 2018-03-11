@@ -20,10 +20,11 @@ from salt.ext.six.moves import range
 
 # Set up logging
 log = logging.getLogger(__name__)
-command = 'salt-call -l quiet --local -c /etc/salt/empty --out=json {0} pillar.items'
+command = 'salt-call -l quiet --local -c /etc/salt/surrogate --out=json {0} pillar.items'
 
 def ext_pillar(minion_id,  # pylint: disable=W0613
                pillar,  # pylint: disable=W0613
+               utf8fix=False,
 	       root=None,
 	       modules=None):
     '''
@@ -38,8 +39,9 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
 
         # TODO: Use spawn in order to fetch stderr and log it.
 	args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
-        data = __salt__['cmd.run'](command.format(" ".join(args)))
-        return _result_unicode_to_utf8(json.loads(data)['local'])
+        output = __salt__['cmd.run'](command.format(" ".join(args)))
+        data = json.loads(output)
+        return (_result_unicode_to_utf8(data) if utf8fix else data)['local']
     except Exception:
         log.critical(
                 'JSON data from {0} failed to parse: {1}'.format(command, sys.exc_info())
