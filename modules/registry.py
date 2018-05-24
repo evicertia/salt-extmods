@@ -43,8 +43,8 @@ def _maxhost_of_subnet(subnet):
 
 class Registry:
     def __init__(self, accounts, hosts, networks):
-        self.hosts = hosts
-        self.networks = networks
+        self.hosts = hosts or {}
+        self.networks = networks or {}
 
     def get_host(self, host):
         return self.hosts[host] if host in self.hosts else {}
@@ -53,10 +53,9 @@ class Registry:
         data = self.get_host(host)
         return data[attr] if attr in data else None
 
-    def get_network(self, addr=None):
+    def get_network(self, addr):
         result = None
         masklen = 33
-        addr = addr if addr != None else self.get_host()
 
         for net, data in self.networks.iteritems():
             cidr = data['cidr'] if 'cidr' in data else None
