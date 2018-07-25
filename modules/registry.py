@@ -152,7 +152,7 @@ class Registry:
         addr = self.get_host_attr(host, 'address')
         if addr is None: return None
 
-        network = self.get_network(host)
+        network = self.get_network(addr)
         if network != None:
             if 'dns' in network: return network['dns']
             if 'cidr' in network:
