@@ -156,7 +156,7 @@ class Registry:
         if network != None:
             if 'dns' in network: return network['dns']
             if 'cidr' in network:
-                result = [ _maxhost_of_subnet(cidr) ]
+                result = [ _maxhost_of_subnet(network['cidr']) ]
         
         return [ self.host_gateway(host) ] if result is None else result
 
