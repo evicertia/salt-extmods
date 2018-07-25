@@ -152,16 +152,12 @@ class Registry:
         addr = self.get_host_attr(host, 'address')
         if addr is None: return None
 
-        for net, data in self.networks.iteritems():
-            cidr = data['cidr'] if 'cidr' in data else None
-            if cidr == None: continue
-
-            if salt.utils.network.in_subnet(cidr, [ addr ]):
-                newlen = int(cidr.split('/')[1])
-                if newlen < masklen:
-                    masklen = newlen
-                    result = [ _maxhost_of_subnet(cidr) ]
-
+        network = self.get_network(host)
+        if network != None:
+            if 'dns' in network: return network['dns']
+            if 'cidr' in network:
+                result = [ _maxhost_of_subnet(cidr) ]
+        
         return [ self.host_gateway(host) ] if result is None else result
 
 # vim: set ai,ts=4,expandtab
