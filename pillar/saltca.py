@@ -28,6 +28,12 @@ except ImportError:
 
 # Set up logging
 log = logging.getLogger(__name__)
+traverse_dict_and_list = None
+
+if salt.version.__version__ >= '2018.3.0':
+    traverse_dict_and_list = salt.utils.data.traverse_dict_and_list
+else:
+    traverse_dict_and_list = salt.utils.traverse_dict_and_list
 
 # Options
 __opts__ = {
@@ -101,7 +107,7 @@ def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
 
     log.debug('Running with: {0} -- {1} -- {2}'.format(caname, capath, attrs))
 
-    if salt.utils.traverse_dict_and_list(pillar, 'pki:saltca:disable', False):
+    if traverse_dict_and_list(pillar, 'pki:saltca:disable', False):
         return res
 
     if caname != None: opts['saltca.pki.name'] = caname;
@@ -111,7 +117,7 @@ def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
         if attr in attrs:
             opts['saltca.pki.' + attr] = attrs[attr]
     
-    if salt.utils.traverse_dict_and_list(pillar, 'pki:certs:' + host, False):
+    if traverse_dict_and_list(pillar, 'pki:certs:' + host, False):
 	return res
 
     cert, key = lookup_cert_for(host, opts)
