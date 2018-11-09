@@ -11,6 +11,13 @@ import hashlib
 import salt.output
 import traceback
 
+traverse_dict_and_list = None
+
+if salt.version.__version__ >= '2018.3.0':
+    traverse_dict_and_list = salt.utils.data.traverse_dict_and_list
+else:
+    traverse_dict_and_list = salt.utils.traverse_dict_and_list
+
 _ANSI2HTML_STYLES = {}
 ANSI2HTML_CODES_RE = re.compile('(?:\033\\[(\d+(?:;\d+)*)?([cnRhlABCDfsurgKJipm]))')
 ANSI2HTML_PALETTE = {
@@ -57,7 +64,7 @@ def is_boolean(o):
 def get(obj, key, default='', delimiter=':'):
     """Returns 'key' from 'obj', by recursively traversing it."""
 
-    return salt.utils.traverse_dict_and_list(obj,
+    return traverse_dict_and_list(obj,
 	key,
 	default,
 	delimiter)
