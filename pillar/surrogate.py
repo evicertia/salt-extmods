@@ -13,6 +13,7 @@ from __future__ import absolute_import
 import logging
 import json
 import sys
+import subprocess
 from salt.utils.odict import OrderedDict
 import salt.ext.six as six
 from salt.ext.six import string_types
@@ -20,7 +21,8 @@ from salt.ext.six.moves import range
 
 # Set up logging
 log = logging.getLogger(__name__)
-command = 'salt-call -l quiet --local -c /etc/salt/surrogate --out=json {0} pillar.items'
+#command = 'salt-call -l quiet --local -c /etc/salt/surrogate --out=json {0} pillar.items'
+saltcmd = [ 'salt-call', '-l', 'quiet', '--local', '-c', '/etc/salt/surrogate', '--out=json' ]
 
 def ext_pillar(minion_id,  # pylint: disable=W0613
                pillar,  # pylint: disable=W0613
@@ -37,9 +39,12 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
 	if root is not None: params['pillar-root'] = root
 	if modules is not None: params['module-dir'] = modules
 
-        # TODO: Use spawn in order to fetch stderr and log it.
 	args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
-        output = __salt__['cmd.run'](command.format(" ".join(args)))
+        command = saltcmd + args + [ 'pillar.items' ]
+        child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output, err = child.communicate()
+        if child.returncode != 0 or (err != None and len(err) > 0):
+            log.error('Surrogate pillar error: {0}'.format(err))
         data = json.loads(output)
         return (_result_unicode_to_utf8(data) if utf8fix else data)['local']
     except Exception:
