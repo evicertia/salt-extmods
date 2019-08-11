@@ -48,7 +48,7 @@ class Registry:
 
     def get_host(self, host):
         return self.hosts[host] if host in self.hosts else {}
-    
+
     def get_host_attr(self, host, attr):
         data = self.get_host(host)
         return data[attr] if attr in data else None
@@ -72,12 +72,14 @@ class Registry:
     def host_iface(self, host=None):
         host = host if host != None else __grains__['id']
         return self.get_host_attr(host, 'iface')
- 
+
     def host_address(self, host=None):
         key = host if host != None else __grains__['id']
         return self.get_host_attr(key, 'address')
 
     def host_vlan(self, host=None):
+        vlan = self.get_host_attr(host, 'vlan')
+        if vlan is not None: return vlan
         addr = self.host_address(host)
         if addr is None: return None
         data = self.get_network(addr)
@@ -136,7 +138,7 @@ class Registry:
 
     def host_gateway(self, host=None):
         host = host if host != None else __grains__['id']
-        
+
         result = self.get_host_attr(host, 'gateway')
         if (result != None): return result
 
@@ -157,7 +159,7 @@ class Registry:
             if 'dns' in network: return network['dns']
             if 'cidr' in network:
                 result = [ _maxhost_of_subnet(network['cidr']) ]
-        
+
         return [ self.host_gateway(host) ] if result is None else result
 
 # vim: set ai,ts=4,expandtab
