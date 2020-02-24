@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Invokes a raw 'salt-call --pillar-root=/... pillar.items' returning surrogate results.
-This pillar module is mainly intended to be used as a workaround when using salt in 
+This pillar module is mainly intended to be used as a workaround when using salt in
 masterless within our vagrant sandbox. (pruiz)
 '''
 from __future__ import absolute_import
@@ -27,25 +27,25 @@ saltcmd = [ 'salt-call', '-l', 'quiet', '--local', '-c', '/etc/salt/surrogate', 
 def ext_pillar(minion_id,  # pylint: disable=W0613
                pillar,  # pylint: disable=W0613
                utf8fix=False,
-	       root=None,
-	       modules=None):
+               root=None,
+               modules=None):
     '''
     Execute a command and read the output as JSON
     '''
     try:
-        log.info('fetching pillar data for {0}.'.format(minion_id))
+        log.info('==> fetching pillar data for {0} [utf8fix: {1}].'.format(minion_id, utf8fix))
 
-	params = {}
-	if root is not None: params['pillar-root'] = root
-	if modules is not None: params['module-dir'] = modules
+        params = {}
+        if root is not None: params['pillar-root'] = root
+        if modules is not None: params['module-dir'] = modules
 
-	args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
+        args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
         command = saltcmd + args + [ 'pillar.items' ]
         child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = child.communicate()
         if child.returncode != 0 or (err != None and len(err) > 0):
             log.error('Surrogate pillar error: {0}'.format(err))
-        data = json.loads(output)
+        data = json.loads(unicode(output))
         return (_result_unicode_to_utf8(data) if utf8fix else data)['local']
     except Exception:
         log.critical(
