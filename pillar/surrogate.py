@@ -28,17 +28,17 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
                utf8fix=False,
                root=None,
                modules=None,
-			   configdir=None):
+               configdir=None):
     '''
     Execute a command and read the output as JSON
     '''
     try:
         log.info('==> fetching pillar data for {0} [utf8fix: {1}].'.format(minion_id, utf8fix))
 
-		params = { 'config-dir': '/etc/salt/surrogate' }
+	    params = { 'config-dir': '/etc/salt/surrogate' }
         if root is not None: params['pillar-root'] = root
         if modules is not None: params['module-dir'] = modules
-		if configdir is not None: params['config-dir'] = configdir
+        if configdir is not None: params['config-dir'] = configdir
 
         args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
         command = saltcmd + args + [ 'pillar.items' ]
