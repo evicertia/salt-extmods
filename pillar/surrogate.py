@@ -40,7 +40,7 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
         if modules is not None: params['module-dir'] = modules
         if configdir is not None: params['config-dir'] = configdir
 
-        args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
+        args = map(lambda (key, value): "--{0}={1}".format(key, value), params.iteritems())
         command = saltcmd + args + [ 'pillar.items' ]
         child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = child.communicate()
