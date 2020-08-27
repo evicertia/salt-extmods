@@ -21,23 +21,24 @@ from salt.ext.six.moves import range
 
 # Set up logging
 log = logging.getLogger(__name__)
-#command = 'salt-call -l quiet --local -c /etc/salt/surrogate --out=json {0} pillar.items'
-saltcmd = [ 'salt-call', '-l', 'quiet', '--local', '-c', '/etc/salt/surrogate', '--out=json' ]
+saltcmd = [ 'salt-call', '-l', 'quiet', '--local', '--out=json' ]
 
 def ext_pillar(minion_id,  # pylint: disable=W0613
                pillar,  # pylint: disable=W0613
                utf8fix=False,
                root=None,
-               modules=None):
+               modules=None,
+			   configdir=None):
     '''
     Execute a command and read the output as JSON
     '''
     try:
         log.info('==> fetching pillar data for {0} [utf8fix: {1}].'.format(minion_id, utf8fix))
 
-        params = {}
+		params = { 'config-dir': '/etc/salt/surrogate' }
         if root is not None: params['pillar-root'] = root
         if modules is not None: params['module-dir'] = modules
+		if configdir is not None: params['config-dir'] = configdir
 
         args = map(lambda (key, value): "--{0}='{1}'".format(key, value), params.iteritems())
         command = saltcmd + args + [ 'pillar.items' ]
