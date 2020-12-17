@@ -65,9 +65,9 @@ def get(obj, key, default='', delimiter=':'):
     """Returns 'key' from 'obj', by recursively traversing it."""
 
     return traverse_dict_and_list(obj,
-	key,
-	default,
-	delimiter)
+    key,
+    default,
+    delimiter)
 
 def _ansi2html_get_styles(palette):
     if palette not in _ANSI2HTML_STYLES:

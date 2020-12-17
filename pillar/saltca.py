@@ -64,7 +64,7 @@ def create_cert_for(host, opts):
     # tls.create_csr hosts cacert_path=/srv/salt/pki CN=sample.test.domain.com O=TESTCA emailAddress=support@test.com "subjectAltName=['DNS:sample.test.domain.com']"
     __salt__['tls.create_csr'](pkiname, 
         cacert_path=cacert_path,
-	cert_type='common',
+        cert_type='common',
         CN=host,
         C=opts['saltca.pki.C'],
         ST=opts['saltca.pki.ST'],
@@ -77,7 +77,7 @@ def create_cert_for(host, opts):
     # salt-call --local -l debug tls.create_ca_signed_cert hosts cacert_path=/srv/salt/pki CN=sample.test.domain.com days=3650
     __salt__['tls.create_ca_signed_cert'](pkiname,
         cacert_path=cacert_path,
-	cert_type='common',
+        cert_type='common',
         CN=host,
         days=opts['saltca.pki.days']
     )
@@ -118,7 +118,7 @@ def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
             opts['saltca.pki.' + attr] = attrs[attr]
     
     if traverse_dict_and_list(pillar, 'pki:certs:' + host, False):
-	return res
+        return res
 
     cert, key = lookup_cert_for(host, opts)
 
