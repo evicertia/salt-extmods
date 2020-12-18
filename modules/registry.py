@@ -66,7 +66,6 @@ class Registry:
                 if newlen < masklen:
                     masklen = newlen
                     result = data
-
         return result
 
     def host_iface(self, host=None):
@@ -142,7 +141,7 @@ class Registry:
         result = self.get_host_attr(host, 'gateway')
         if (result != None): return result
 
-	return _maxhost_of_subnet(self.host_subnet(host))
+        return _maxhost_of_subnet(self.host_subnet(host))
 
     def host_dnslist(self, host=None):
         host = host if host != None else __grains__['id']

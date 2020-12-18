@@ -40,13 +40,14 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
         if modules is not None: params['module-dir'] = modules
         if configdir is not None: params['config-dir'] = configdir
 
-        args = map(lambda (key, value): "--{0}={1}".format(key, value), params.iteritems())
+        #args = map(lambda (key, value): "--{0}={1}".format(key, value), params.iteritems())
+        args = ["--{0}={1}".format(key, value) for key, value in six.iteritems(params)]
         command = saltcmd + args + [ 'pillar.items' ]
         child = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = child.communicate()
         if child.returncode != 0 or (err != None and len(err) > 0):
             log.error('Surrogate pillar error: {0}'.format(err))
-        data = json.loads(unicode(output))
+        data = json.loads(six.unicode(output))
         return (_result_unicode_to_utf8(data) if utf8fix else data)['local']
     except Exception:
         log.critical(
