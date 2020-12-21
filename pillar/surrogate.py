@@ -16,7 +16,6 @@ import sys
 import subprocess
 from salt.utils.odict import OrderedDict
 import salt.ext.six as six
-from salt.ext.six import string_types
 from salt.ext.six.moves import range
 
 # Set up logging
@@ -47,7 +46,7 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
         output, err = child.communicate()
         if child.returncode != 0 or (err != None and len(err) > 0):
             log.error('Surrogate pillar error: {0}'.format(err))
-        data = json.loads(six.unicode(output))
+        data = json.loads(six.ensure_text(output))
         return (_result_unicode_to_utf8(data) if utf8fix else data)['local']
     except Exception:
         log.critical(
