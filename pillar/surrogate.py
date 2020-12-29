@@ -22,6 +22,24 @@ from salt.ext.six.moves import range
 log = logging.getLogger(__name__)
 saltcmd = [ 'salt-call', '-l', 'quiet', '--local', '--out=json' ]
 
+# XXX: Taken from six's source so we support 2018.x
+#      where six's version does not yet implement it.
+def ensure_text(s, encoding='utf-8', errors='strict'):
+    """Coerce *s* to six.text_type.
+    For Python 2:
+      - `unicode` -> `unicode`
+      - `str` -> `unicode`
+    For Python 3:
+      - `str` -> `str`
+      - `bytes` -> decoded to `str`
+    """
+    if isinstance(s, six.binary_type):
+        return s.decode(encoding, errors)
+    elif isinstance(s, six.text_type):
+        return s
+    else:
+        raise TypeError("not expecting type '%s'" % type(s))
+
 def ext_pillar(minion_id,  # pylint: disable=W0613
                pillar,  # pylint: disable=W0613
                utf8fix=False,
@@ -46,7 +64,7 @@ def ext_pillar(minion_id,  # pylint: disable=W0613
         output, err = child.communicate()
         if child.returncode != 0 or (err != None and len(err) > 0):
             log.error('Surrogate pillar error: {0}'.format(err))
-        data = json.loads(six.ensure_text(output))
+        data = json.loads(ensure_text(output))
         return (_result_unicode_to_utf8(data) if utf8fix else data)['local']
     except Exception:
         log.critical(
