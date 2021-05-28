@@ -14,7 +14,11 @@ import yaml
 # Import salt libs
 import salt.utils
 import salt.utils.network
-from salt._compat import string_types
+
+try:
+    from salt._compat import string_types
+except ImportError:
+    from salt.ext.six import string_types
 
 log = logging.getLogger(__name__)
 

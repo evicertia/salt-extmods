@@ -11,7 +11,11 @@ import yaml
 
 # Import salt libs
 import salt.utils
-from salt._compat import string_types
+
+try:
+	from salt._compat import string_types
+except ImportError:
+	from salt.ext.six import string_types
 
 traverse_dict_and_list = None
 
