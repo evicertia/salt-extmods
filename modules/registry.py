@@ -7,6 +7,7 @@ from __future__ import absolute_import
 # Import python libs
 import logging
 import collections
+from salt.ext import six
 
 # Import third party libs
 import yaml
@@ -61,7 +62,7 @@ class Registry:
         result = None
         masklen = 33
 
-        for net, data in self.networks.iteritems():
+        for net, data in six.iteritems(self.networks):
             cidr = data['cidr'] if 'cidr' in data else None
             if cidr == None: continue
 
@@ -101,7 +102,7 @@ class Registry:
         result = None
         masklen = 33
 
-        for net, data in self.networks.iteritems():
+        for net, data in six.iteritems(self.networks):
             cidr = data['cidr'] if 'cidr' in data else None
             if cidr == None: continue
 
@@ -123,7 +124,7 @@ class Registry:
         addr = self.get_host_attr(host, 'address')
         if addr is None: return None
 
-        for net, data in self.networks.iteritems():
+        for net, data in six.iteritems(self.networks):
             cidr = data['cidr'] if 'cidr' in data else None
             if cidr == None: continue
 

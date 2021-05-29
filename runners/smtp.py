@@ -166,7 +166,7 @@ def send_msg(recipient,
             if not tmplines:
                 msg = 'Failed to read rendered template file {0} ({1})'
                 log.debug(msg.format(tmplfn, message))
-		raise ValueError(msg.format(tmplfn, message))
+                raise ValueError(msg.format(tmplfn, message))
             message = ''.join(tmplines)
         else:
             msg = 'Failed to load template file {0}'.format(message)
