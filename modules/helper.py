@@ -11,6 +11,8 @@ import hashlib
 import salt.output
 import traceback
 
+from six import ensure_binary
+
 traverse_dict_and_list = None
 
 if salt.version.__version__ >= '2018.3.0':
@@ -46,7 +48,7 @@ def regex_match(s, pattern):
 
 def md5hash(s):
     m = hashlib.md5()
-    m.update(s)
+    m.update(ensure_binary(s))
     return m.hexdigest()
 
 def throw(s):
