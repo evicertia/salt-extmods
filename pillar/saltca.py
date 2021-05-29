@@ -11,7 +11,18 @@ import copy
 import ctypes
 import os.path
 import logging
-import contextlib
+
+try:
+    from contextlib import nested
+except ImportError:
+    from contextlib import ExitStack, contextmanager
+
+    @contextmanager
+    def nested(*contexts):
+        with ExitStack() as stack:
+            for ctx in contexts:
+                stack.enter_context(ctx)
+            yield contexts
 
 # Import salt libs
 import salt.utils
@@ -62,7 +73,7 @@ def create_cert_for(host, opts):
     cacert_path = opts['saltca.pki.path']
     pkiname = opts['saltca.pki.name']
     # tls.create_csr hosts cacert_path=/srv/salt/pki CN=sample.test.domain.com O=TESTCA emailAddress=support@test.com "subjectAltName=['DNS:sample.test.domain.com']"
-    __salt__['tls.create_csr'](pkiname, 
+    __salt__['tls.create_csr'](pkiname,
         cacert_path=cacert_path,
         cert_type='common',
         CN=host,
@@ -112,11 +123,11 @@ def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
 
     if caname != None: opts['saltca.pki.name'] = caname;
     if capath != None: opts['saltca.pki.path'] = capath;
-    
+
     for attr in [ 'C', 'ST', 'L', 'O', 'OU', 'emailAddress' ]:
         if attr in attrs:
             opts['saltca.pki.' + attr] = attrs[attr]
-    
+
     if traverse_dict_and_list(pillar, 'pki:certs:' + host, False):
         return res
 
