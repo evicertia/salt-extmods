@@ -105,7 +105,7 @@ def lookup_cert_for(host, opts):
     if not os.path.isfile(crtfile) or not os.path.isfile(keyfile):
         return (None, None)
 
-    with contextlib.nested(open(crtfile), open(keyfile)) as (c, k):
+    with nested(open(crtfile), open(keyfile)) as (c, k):
         return (c.read(), k.read())
 
 def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
