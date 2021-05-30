@@ -10,8 +10,14 @@ import copy
 import hashlib
 import salt.output
 import traceback
+import six
 
-from six import ensure_binary
+try:
+	from six import ensure_binary
+except ImportError:
+	def ensure_binary(s):
+		# Fallback for py2 w/o six
+		return s
 
 traverse_dict_and_list = None
 
