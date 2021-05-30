@@ -26,11 +26,6 @@ def __virtual__():
     return True
 
 def dec(data, **kwargs):
-    """
-    Alias to `{box_type}_decrypt`
-
-    box_type: secretbox, sealedbox(default)
-    """
     encoding = kwargs.pop("encoding", None)
     result = __salt__['nacl.dec'](data, **kwargs)
 
@@ -38,3 +33,12 @@ def dec(data, **kwargs):
         return to_str(result, encoding)
 
     return result
+
+def dec_file(name, out=None, **kwargs):
+	encoding = kwargs.pop("encoding", None)
+	result = __salt__['nacl.dec_file'](data, out=out, **kwargs)
+
+	if encoding:
+		return to_str(result, encoding)
+
+	return result
