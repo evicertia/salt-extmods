@@ -10,7 +10,7 @@ from salt.utils.stringutils import to_str
 
 REQ_ERROR = None
 try:
-   import salt.utils.nacl
+   import salt.modules.nacl
 except (ImportError, OSError) as e:
    REQ_ERROR = True
 
@@ -32,7 +32,7 @@ def dec(data, **kwargs):
     box_type: secretbox, sealedbox(default)
     """
     kwargs["opts"] = __opts__
-    result = salt.utils.nacl.dec(data, **kwargs)
+    result = __salt__['nacl.dec'](data, **kwargs)
     encoding = kwargs.get("encoding")
 
     if encoding:
