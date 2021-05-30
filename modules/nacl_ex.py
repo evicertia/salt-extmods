@@ -31,9 +31,8 @@ def dec(data, **kwargs):
 
     box_type: secretbox, sealedbox(default)
     """
-    kwargs["opts"] = __opts__
+    encoding = kwargs.pop("encoding", None)
     result = __salt__['nacl.dec'](data, **kwargs)
-    encoding = kwargs.get("encoding")
 
     if encoding:
         return to_str(result, encoding)
