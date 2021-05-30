@@ -36,7 +36,7 @@ def dec(data, **kwargs):
 
 def dec_file(name, out=None, **kwargs):
 	encoding = kwargs.pop("encoding", None)
-	result = __salt__['nacl.dec_file'](data, out=out, **kwargs)
+	result = __salt__['nacl.dec_file'](name, out=out, **kwargs)
 
 	if encoding:
 		return to_str(result, encoding)
