@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 
-# Import Python libs
-from __future__ import absolute_import
-import io
-
 # Import 3rd-party libs
-import salt.ext.six as six
+import salt.utils.nacl
 import salt.utils.files
 from salt.utils.stringutils import to_str,to_bytes
 
 REQ_ERROR = None
 try:
-   import salt.modules.nacl
+   import salt.utils.nacl
+   salt.utils.nacl.check_requirements()
 except (ImportError, OSError) as e:
    REQ_ERROR = True
-
 
 __virtualname__ = 'nacl_ex'
 
@@ -26,33 +22,16 @@ def __virtual__():
         return False
     return True
 
-def dec(data, **kwargs):
-    encoding = kwargs.pop("encoding", None)
-    result = __salt__['nacl.dec'](data, **kwargs)
-
-    if encoding:
-        return to_str(result, encoding)
-
-    return result
-
-def dec_file(name, out=None, **kwargs):
-	encoding = kwargs.pop("encoding", None)
-	result = __salt__['nacl.dec_file'](name, out=out, **kwargs)
-
-	if encoding:
-		return to_str(result, encoding)
-
-	return result
-
 def enc_file(name, out=None, **kwargs):
     data = None
     try:
-        return __salt__['enc_file'](name, out, **kwargs);
+        kwargs["opts"] = __opts__
+        return salt.utils.nacl.enc_file(name, out, **kwargs)
     except Exception as e:  # pylint: disable=broad-except
         # likly using salt-run so fallback to local filesystem
         with salt.utils.files.fopen(name, "rb") as f:
             data = to_bytes(f.read())
-    d = __salt__['nacl.enc'](data, **kwargs)
+    d = salt.utils.nacl.enc(data, **kwargs)
     if out:
         if os.path.isfile(out):
             raise Exception("file:{} already exist.".format(out))
