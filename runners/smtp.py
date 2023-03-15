@@ -161,7 +161,7 @@ def send_msg(recipient,
         log.debug(msg.format(tmplfn, message))
         if tmplfn:
             tmplines = None
-            with salt.utils.fopen(tmplfn, 'rb') as fp_:
+            with salt.utils.files.fopen(tmplfn, 'rb') as fp_:
                 tmplines = fp_.readlines()
             if not tmplines:
                 msg = 'Failed to read rendered template file {0} ({1})'
