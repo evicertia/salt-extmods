@@ -134,7 +134,17 @@ def ext_pillar(minion_id, pillar, caname=None, capath=None, attrs={}):
     cert, key = lookup_cert_for(host, opts)
 
     if cert == None or key == None:
-        cert, key = create_cert_for(host, opts)
+        phack = False
+        if not 'pillar.get' in __salt__:
+            # Ensure pillar.get is present while calling tls module
+            phack = True
+            __pillar__.update(pillar)
+            __salt__['pillar.get'] = __pillar__.get
+        try:
+            cert, key = create_cert_for(host, opts)
+        finally:
+            if phack:
+                __salt__.pop('pillar.get')
 
     if cert != None or key != None:
         data = res['pki'] = pillar['pki'] if 'pki' in pillar else {}
