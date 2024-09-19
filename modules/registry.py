@@ -60,7 +60,7 @@ class Registry:
 
     def get_network(self, addr):
         result = None
-        masklen = 33
+        masklen = 0
 
         for net, data in six.iteritems(self.networks):
             cidr = data['cidr'] if 'cidr' in data else None
@@ -68,7 +68,7 @@ class Registry:
 
             if salt.utils.network.in_subnet(cidr, [ addr ]):
                 newlen = int(cidr.split('/')[1])
-                if newlen < masklen:
+                if newlen > masklen:
                     masklen = newlen
                     result = data
         return result
@@ -100,7 +100,7 @@ class Registry:
         if (netmask != None): return salt.utils.netmask.calculate_subnet(addr, result)
 
         result = None
-        masklen = 33
+        masklen = 0
 
         for net, data in six.iteritems(self.networks):
             cidr = data['cidr'] if 'cidr' in data else None
@@ -108,14 +108,14 @@ class Registry:
 
             if salt.utils.network.in_subnet(cidr, [ addr ]):
                 newlen = int(cidr.split('/')[1])
-                if newlen < masklen:
+                if newlen > masklen:
                     masklen = newlen
                     result = cidr
 
         return result
 
     def host_netmask(self, host=None):
-        masklen = 33
+        masklen = 0
         host = host if host != None else __grains__['id']
 
         result = self.get_host_attr(host, 'netmask')
@@ -130,7 +130,7 @@ class Registry:
 
             if salt.utils.network.in_subnet(cidr, [ addr ]):
                 newlen = int(cidr.split('/')[1])
-                if newlen < masklen:
+                if newlen > masklen:
                     masklen = newlen
                     result = salt.utils.network.cidr_to_ipv4_netmask(newlen)
 
