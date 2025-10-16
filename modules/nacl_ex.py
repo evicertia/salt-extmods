@@ -5,7 +5,11 @@ from __future__ import absolute_import
 import io
 
 # Import 3rd-party libs
-import salt.ext.six as six
+try:
+    import six
+except Exception:
+    from salt.ext import six  # Fallback for Salt <3006
+
 import salt.utils.files
 from salt.utils.stringutils import to_str,to_bytes
 

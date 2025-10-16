@@ -7,19 +7,19 @@ from __future__ import absolute_import
 # Import python libs
 import logging
 import collections
-from salt.ext import six
 
 # Import third party libs
 import yaml
+try:
+    import six
+except Exception:
+    from salt.ext import six  # Fallback for Salt <3006
 
 # Import salt libs
 import salt.utils
 import salt.utils.network
 
-try:
-    from salt._compat import string_types
-except ImportError:
-    from salt.ext.six import string_types
+string_types = (str,)
 
 log = logging.getLogger(__name__)
 
