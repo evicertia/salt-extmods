@@ -15,8 +15,12 @@ import json
 import sys
 import subprocess
 from salt.utils.odict import OrderedDict
-import salt.ext.six as six
-from salt.ext.six.moves import range
+
+# Import 3rd-party libs
+try:
+    import six
+except Exception:
+    from salt.ext import six  # Fallback for Salt <3006
 
 # Set up logging
 log = logging.getLogger(__name__)

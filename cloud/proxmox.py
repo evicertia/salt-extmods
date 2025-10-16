@@ -35,7 +35,6 @@ import re
 import json
 
 # Import salt libs
-import salt.ext.six as six
 import salt.utils
 
 # Import salt cloud libs
@@ -46,9 +45,13 @@ from salt.exceptions import (
     SaltCloudExecutionFailure,
     SaltCloudExecutionTimeout
 )
-from salt.ext.six.moves import range
 
 # Import Third Party Libs
+try:
+    import six
+except Exception:
+    from salt.ext import six  # Fallback for Salt <3006
+
 try:
     import requests
     HAS_REQUESTS = True

@@ -6,8 +6,10 @@ import io
 
 # Import 3rd-party libs
 import yaml
-import salt.ext.six as six
-
+try:
+    import six
+except Exception:
+    from salt.ext import six  # Fallback for Salt <3006
 
 def yaml_dquote(text, split=True):
     '''
